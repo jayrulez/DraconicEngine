@@ -81,6 +81,9 @@ int main(int argc, char* argv[])
     if (vs_data.empty() || fs_data.empty()) {
         std::println("Failed to load shaders");
         std::println("Workin' dir: {}", std::filesystem::current_path().string());
+        draco::rhi::shutdown();
+        SDL_DestroyWindow(window);
+        SDL_Quit();
         return -1;
     }
 
@@ -115,6 +118,7 @@ int main(int argc, char* argv[])
 
         draco::rhi::RenderPacket packet{};
         packet.vertex_buffer = vbh;
+        packet.index_buffer = UINT16_MAX;  // No index buffer
         packet.pipeline = pipeline;
         bx::mtxIdentity(packet.model);
         
