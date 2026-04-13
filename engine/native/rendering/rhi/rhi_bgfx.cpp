@@ -25,6 +25,7 @@ namespace draco::rhi
 
     static std::vector<Buffer>   g_buffers;
     static std::vector<Pipeline> g_pipelines;
+    static std::vector<bgfx::UniformHandle> g_uniforms;
 
     static uint16_t g_width = 0;
     static uint16_t g_height = 0;
@@ -76,9 +77,16 @@ namespace draco::rhi
             if (bgfx::isValid(p.program)) bgfx::destroy(p.program);
         }
 
+        for (auto& u : g_uniforms)
+        {
+            // Destroy the uniforms
+            if (bgfx::isValid(u)) bgfx::destroy(u);
+        }
+
         // Clear everything so we don't have dangling handles
         g_buffers.clear();
         g_pipelines.clear();
+        g_uniforms.clear();
 
         // Have bgfx destroy the context and everything it holds internally
         bgfx::shutdown();
@@ -101,10 +109,12 @@ namespace draco::rhi
     uint64_t map_state(PipelineState state)
     {
         uint64_t bgfx_state = BGFX_STATE_NONE;
-        if (state & PipelineState::WriteRGB) bgfx_state |= BGFX_STATE_WRITE_RGB;
-        if (state & PipelineState::WriteAlpha) bgfx_state |= BGFX_STATE_WRITE_A;
-        if (state & PipelineState::MSAA) bgfx_state |= BGFX_STATE_MSAA;
-        if (state & PipelineState::PrimitiveTriStrip) bgfx_state |= BGFX_STATE_PT_TRISTRIP;
+        // Cast to uint64_t so the 'if' can treat it as a boolean check
+        // Otherwise, the bitwise check would fail since PipelineState is an enum class and doesn't implicitly convert to uint64_t
+        if (static_cast<uint64_t>(state & PipelineState::WriteRGB)) bgfx_state |= BGFX_STATE_WRITE_RGB;
+        if (static_cast<uint64_t>(state & PipelineState::WriteAlpha)) bgfx_state |= BGFX_STATE_WRITE_A;
+        if (static_cast<uint64_t>(state & PipelineState::MSAA)) bgfx_state |= BGFX_STATE_MSAA;
+        if (static_cast<uint64_t>(state & PipelineState::PrimitiveTriStrip)) bgfx_state |= BGFX_STATE_PT_TRISTRIP;
         return bgfx_state;
     }
 
@@ -185,6 +195,44 @@ namespace draco::rhi
         return (BufferHandle)(g_buffers.size() - 1);
     }
 
+    static bgfx::UniformType::Enum map_uniform_type(UniformType type) {
+        switch (type) {
+            case UniformType::Sampler: return bgfx::UniformType::Sampler;
+            case UniformType::Vec4:    return bgfx::UniformType::Vec4;
+            case UniformType::Mat3:    return bgfx::UniformType::Mat3;
+            case UniformType::Mat4:    return bgfx::UniformType::Mat4;
+        }
+        return bgfx::UniformType::Count;
+    }
+
+    UniformHandle create_uniform(const char* name, UniformType type, uint16_t num) {
+        bgfx::UniformHandle handle = bgfx::createUniform(name, map_uniform_type(type), num);
+        g_uniforms.push_back(handle);
+        return static_cast<UniformHandle>(g_uniforms.size() - 1);
+    }
+
+    void set_uniform(UniformHandle handle, const void* value, uint16_t num) {
+        // Check for null/invalid handles
+        if (handle == InvalidUniform) return; 
+
+        // Check for out of bound handles
+        if (handle >= g_uniforms.size()) {
+            std::println("Error: Uniform handle out of bounds!");
+            return;
+        }
+
+        bgfx::setUniform(g_uniforms[handle], value, num);
+    }
+
+    void destroy_uniform(UniformHandle handle) {
+        if (handle < g_uniforms.size() && bgfx::isValid(g_uniforms[handle])) {
+            bgfx::destroy(g_uniforms[handle]);
+            // We don't remove from vector to keep indices stable, 
+            // just invalidate the handle
+            g_uniforms[handle] = BGFX_INVALID_HANDLE;
+        }
+    }
+
     void identity_matrix(float* _mtx)
     {
         bx::mtxIdentity(_mtx);
@@ -219,6 +267,11 @@ namespace draco::rhi
             Buffer& ib = g_buffers[p.index_buffer];
             if (ib.is_index)
                 bgfx::setIndexBuffer(ib.ibh);
+        }
+
+        if (p.uniform_handle != InvalidUniform && p.uniform_handle < g_uniforms.size())
+        {
+            bgfx::setUniform(g_uniforms[p.uniform_handle], p.uniform_data, 1);
         }
 
         bgfx::setState(pipeline.state);

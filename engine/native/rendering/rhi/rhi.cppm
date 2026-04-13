@@ -11,7 +11,14 @@ export namespace draco::rhi
     using BufferHandle   = uint16_t;
     using PipelineHandle = uint16_t;
     using ShaderHandle   = uint16_t;
+    using UniformHandle  = uint16_t;
     using ViewID         = uint16_t;
+
+    inline constexpr BufferHandle InvalidBuffer = 0xFFFF;
+    inline constexpr PipelineHandle InvalidPipeline = 0xFFFF;
+    inline constexpr ShaderHandle InvalidShader = 0xFFFF;
+    inline constexpr UniformHandle InvalidUniform = 0xFFFF;
+    inline constexpr ViewID InvalidView = 0xFFFF;
 
     enum class PipelineState : uint64_t {
         Default = 0,
@@ -21,6 +28,14 @@ export namespace draco::rhi
         PrimitiveTriStrip = 1 << 3,
     };
 
+    enum class UniformType
+    {
+        Sampler, // For textures
+        Vec4, // For colors or simple data
+        Mat3, // For normal matrices
+        Mat4, // For transform matrices
+    };
+
     struct RenderPacket
     {
         uint64_t sort_key;
@@ -28,6 +43,9 @@ export namespace draco::rhi
         BufferHandle vertex_buffer;
         BufferHandle index_buffer;
         PipelineHandle pipeline;
+        UniformHandle uniform_handle = InvalidUniform;
+        
+        const void* uniform_data = nullptr;
 
         float model[16];
         uint32_t draw_tags;
@@ -39,11 +57,6 @@ export namespace draco::rhi
         ShaderHandle fs;
         PipelineState state;
     };
-
-    inline constexpr BufferHandle InvalidBuffer = 0xFFFF;
-    inline constexpr PipelineHandle InvalidPipeline = 0xFFFF;
-    inline constexpr ShaderHandle InvalidShader = 0xFFFF;
-    inline constexpr ViewID InvalidView = 0xFFFF;
 
     bool init(void* display_type, void* window_handle, uint16_t width, uint16_t height);
     void shutdown();
@@ -61,6 +74,13 @@ export namespace draco::rhi
     BufferHandle create_vertex_buffer(const void* data, uint32_t size);
     BufferHandle create_index_buffer(const void* data, uint32_t size);
 
+    // Create a uniform with the given name, type & count
+    UniformHandle create_uniform(const char* name, UniformType type, uint16_t num = 1);
+    void destroy_uniform(UniformHandle handle);
+
+    // Set the value of a uniform with the given handle, value & count
+    void set_uniform(UniformHandle handle, const void* value, uint16_t num = 1);
+
     // Helper function to set a 4x4 matrix to the identity matrix
     void identity_matrix(float* _mtx);
 
@@ -75,7 +95,7 @@ export namespace draco::rhi
         return static_cast<PipelineState>(static_cast<uint64_t>(a) | static_cast<uint64_t>(b));
     }
 
-    constexpr bool operator&(PipelineState a, PipelineState b) {
-        return static_cast<bool>(static_cast<uint64_t>(a) & static_cast<uint64_t>(b));
+    constexpr PipelineState operator&(PipelineState a, PipelineState b) {
+        return static_cast<PipelineState>(static_cast<uint64_t>(a) & static_cast<uint64_t>(b));
     }
 }

@@ -114,7 +114,15 @@ int main(int argc, char* argv[])
     draco::rhi::PipelineState::PrimitiveTriStrip
     });
 
+    // Create a uniform for a color tint
+    auto u_tint = draco::rhi::create_uniform("u_tint", draco::rhi::UniformType::Vec4);
+
+    // Create a uniform for an offset
+    auto u_offset = draco::rhi::create_uniform("u_offset", draco::rhi::UniformType::Vec4);
+
     bool running = true;
+
+    float time = 0.0f;
 
     while (running)
     {
@@ -130,15 +138,26 @@ int main(int argc, char* argv[])
 
         draco::rhi::resize(uint16_t(w), uint16_t(h));
 
+        time += 0.01f;
+
         draco::rhi::begin_frame();
+
+        // Prepare uniform data (Must be float arrays for Vec4)
+        float tint[4] = { 1.0f, 0.5f, 0.2f, 1.0f }; // Warm orange
+        float offset[4] = { std::sin(time), std::cos(time), 0.0f, 0.0f }; // Circular motion
+
+        // Upload to the RHI (This prepares the state for the next submit)
+        draco::rhi::set_uniform(u_tint, tint);
+        draco::rhi::set_uniform(u_offset, offset);
 
         draco::rhi::RenderPacket packet{};
         packet.vertex_buffer = vbh;
-        packet.index_buffer = draco::rhi::InvalidBuffer;  // No index buffer
+        packet.index_buffer = draco::rhi::InvalidBuffer;
         packet.pipeline = pipeline;
         
         draco::rhi::identity_matrix(packet.model);
 
+        // Submit uses the currently bound uniforms
         draco::rhi::submit(packet, 0);
 
         draco::rhi::end_frame();
