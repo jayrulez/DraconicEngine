@@ -23,13 +23,26 @@ export namespace draco::rendering::rhi
         g_uniform_map[hash] = h;
     }
 
+    inline void unregister_uniform(uint32_t hash, UniformHandle h)
+    {
+        auto it = g_uniform_map.find(hash);
+        
+        if (it != g_uniform_map.end() && it->second == h)
+            g_uniform_map.erase(it);
+    }
+
+    inline void clear_uniform_registry()
+    {
+        g_uniform_map.clear();
+    }
+
     inline UniformHandle get_uniform(uint32_t hash)
     {
         auto it = g_uniform_map.find(hash);
 
         if (it == g_uniform_map.end())
             return InvalidUniform;
-
+        
         return it->second;
     }
 }
