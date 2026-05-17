@@ -79,6 +79,7 @@ TEST_CASE("Bump allocator data is well packed")
 	bump::deinit(&bumpAlloc);
 }
 
+// this test needs improvement as the page size on windows is 64k
 TEST_CASE("Bump allocator allocates second page when available")
 {
 	using namespace draco::memory;

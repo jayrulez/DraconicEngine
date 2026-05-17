@@ -77,6 +77,7 @@ export namespace draco::memory
 			size_t pos = allocData->allocated;
 			size_t oldPos = pos;
 			size_t reqSize = size;
+			size_t spillover = 0;
 			Slice newBlock;
 			uintptr_t currentPtr;
 			lastNode = node;
@@ -92,6 +93,10 @@ export namespace draco::memory
 			reqSize += ((reqSize + currentPtr - 1) & alignMask);
 			if (!(*lastNode) || (reqSize > ((*lastNode)->size - oldPos)))
 			{
+				if (*lastNode)
+				{
+					spillover = ((*lastNode)->size - oldPos);
+				}
 				reqSize = (sizeof(Node) + size) & ~alignMask;
 				err = allocData->base.vtbl->alloc(
 					allocData->base,
@@ -111,7 +116,7 @@ export namespace draco::memory
 			currentPtr = ((uintptr_t)&((*lastNode)->data[oldPos]));
 			reqSize = (size + ((currentPtr - 1) & alignMask)) & ~alignMask;
 			currentPtr = (currentPtr + alignMask) & ~alignMask;
-			allocData->allocated += reqSize;
+			allocData->allocated += reqSize + spillover;
 			dst->data = (void*)currentPtr;
 			dst->size = size;
 			return Error::Okay;
