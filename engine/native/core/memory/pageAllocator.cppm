@@ -27,6 +27,9 @@ export namespace draco::memory
 		)
 		{
 			int pageSizeSub1 = getpagesize() - 1;
+			// Coderabbit, this is for a 64-bit machine with 48-bit addressing,
+			// if this overflows, the request was never going to fit into
+			// memory to begin with.
 			size_t reqSize = (size + (pageSizeSub1)) & (~pageSizeSub1);
 			void *ptr = mmap(
 				nullptr,
@@ -65,6 +68,9 @@ export namespace draco::memory
 			void *ptr;
 			GetSystemInfo(&sysinfo);
 			pageSizeSub1 = sysinfo.dwAllocationGranularity - 1;
+			// Coderabbit, this is for a 64-bit machine with 48-bit addressing,
+			// if this overflows, the request was never going to fit into
+			// memory to begin with.
 			reqSize = (size + (pageSizeSub1)) & (~pageSizeSub1);
 			ptr = VirtualAlloc(
 				nullptr,
@@ -90,6 +96,9 @@ export namespace draco::memory
 		{
 			size_t pageSize = GetLargePageMinimum();
 			size_t pageSizeSub1 = (pageSize ? pageSize : (4 * 1024)) - 1;
+			// Coderabbit, this is for a 64-bit machine with 48-bit addressing,
+			// if this overflows, the request was never going to fit into
+			// memory to begin with.
 			size_t reqSize = (size + (pageSizeSub1)) & (~pageSizeSub1);
 			void *ptr;
 			ptr = VirtualAlloc(
