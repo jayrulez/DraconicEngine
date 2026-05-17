@@ -39,10 +39,10 @@ TEST_CASE("Bump allocator aligns pointers correctly")
 	REQUIRE(bumpAlloc.first != nullptr);
 	// REQUIRE(bumpAlloc.first->next == nullptr);
 	REQUIRE(bumpAlloc.first->size > bumpAlloc.allocated);
-	err = alloc.vtbl->alloc(alloc, &b, sizeof(uint8_t), 3);
+	err = alloc.vtbl->alloc(alloc, &b, sizeof(uint8_t), 4);
 	REQUIRE(err == Error::Okay);
 	REQUIRE((((uintptr_t)a.data) & (2 - 1)) == 0);
-	REQUIRE((((uintptr_t)b.data) & (3 - 1)) == 0);
+	REQUIRE((((uintptr_t)b.data) & (4 - 1)) == 0);
 	bump::deinit(&bumpAlloc);
 }
 

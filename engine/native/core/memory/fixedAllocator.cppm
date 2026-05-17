@@ -1,6 +1,9 @@
 module;
 
+#include <bit>
+#include <cassert>
 #include <cstddef>
+#include <cstdint>
 
 export module core.memory.fixedAllocator;
 export import core.memory.allocator;
@@ -12,14 +15,14 @@ export namespace draco::memory
 	{
 		struct FixedAllocator
 		{
-			void *buffer;
+			uint8_t *buffer;
 			size_t size;
 			bool allocated;
 		};
 
 		void init(FixedAllocator *alloc, Slice block)
 		{
-			alloc->buffer = block.data;
+			alloc->buffer = (uint8_t *)block.data;
 			alloc->size = block.size;
 			alloc->allocated = false;
 		}
@@ -32,17 +35,22 @@ export namespace draco::memory
 		)
 		{
 			FixedAllocator *allocData = (FixedAllocator*)alloc.allocatorData;
-			if (allocData->allocated)
+			size_t alignMask = align - 1;
+			size_t alignedSize = allocData->size - (
+				(align - (((uintptr_t)allocData->buffer) & alignMask))
+				& alignMask
+			);
+			assert(std::popcount(align) == 1);
+			if (allocData->allocated | (alignedSize < size))
 			{
 				return Error::OutOfMemory;
 			}
-			else
-			{
-				dst->data = allocData->buffer;
-				dst->size = allocData->size;
-				allocData->allocated = true;
-				return Error::Okay;
-			}
+			dst->data = (void *)(
+				((uintptr_t)&(allocData->buffer[alignMask])) & ~alignMask
+			);
+			dst->size = alignedSize;
+			allocData->allocated = true;
+			return Error::Okay;
 		}
 
 		Error freeAll(Allocator alloc)

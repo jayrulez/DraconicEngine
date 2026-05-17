@@ -79,6 +79,7 @@ export namespace draco::memory
 			size_t spillover = 0;
 			Slice newBlock;
 			uintptr_t currentPtr;
+			assert(std::popcount(align) == 1);
 			lastNode = node;
 			while (((*node) != nullptr) & (pos > 0))
 			{
