@@ -76,11 +76,11 @@ namespace draco::memory::page
 			);
 			if (ptr == nullptr)
 			{
-				return AllocatorError::OutOfMemory;
+				return Error::OutOfMemory;
 			}
 			dst->data = ptr;
 			dst->size = reqSize;
-			return AllocatorError::Okay;
+			return Error::Okay;
 		}
 
 		Error allocLargePages(
@@ -105,11 +105,11 @@ namespace draco::memory::page
 			);
 			if (ptr == nullptr)
 			{
-				return AllocatorError::OutOfMemory;
+				return Error::OutOfMemory;
 			}
 			dst->data = ptr;
 			dst->size = reqSize;
-			return AllocatorError::Okay;
+			return Error::Okay;
 		}
 
 		Error free(Allocator alloc, Slice block)
