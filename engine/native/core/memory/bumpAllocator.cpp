@@ -63,7 +63,7 @@ namespace draco::memory::bump
 			node = &((*node)->next);
 		}
 		assert(pos == 0); // fraudulent mark provided
-		currentPtr = (uintptr_t)&((*lastNode)->data[oldPos]);
+		currentPtr = (uintptr_t)(oldPos + sizeof(Node));
 		reqSize = size + ((align - (currentPtr & alignMask)) & alignMask);
 		if (!(*lastNode) || (reqSize > ((*lastNode)->size - oldPos)))
 		{
