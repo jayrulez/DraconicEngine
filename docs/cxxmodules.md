@@ -98,3 +98,50 @@ void private_foobar()
 void foobar()
 { /* */ }
 ```
+
+### How to add modules code in CMake
+
+Our `CMake` project contains scripts that make it easy to add modules to the source tree.
+
+Simply add your library containing the modules to a subdirectory
+and use the `add_modules_library` function.
+
+In this example, the library is called "my_modules".
+It exports module_1 and module_2, which in turn use subcomponent_1
+and subcomponent_2 modules as well.
+Most of these modules have an internal implementation unit as discussed above.
+We also provide two unit test programs for the my_modules library.
+Files that end in `.test.cpp` are automatically added to CTest.
+
+```
+my_modules/
+├── subcomponent_1/
+|   ├── subcomponent_1.cppm
+|   └── subcomponent_1.cpp
+├── subcomponent_2/
+|   ├── subcomponent_2.cppm
+|   └── subcomponent_2.cpp
+├── module_1.cppm
+├── module_1.test.cpp
+├── module_2.cppm
+├── module_2.cpp
+├── module_2.test.cpp
+└── CMakeLists.txt
+```
+
+The CMakelists.txt in the my_modules directory needs to refer to the modules libraries
+in its subdirectories.
+
+```cmake
+add_modules_library(subcomponent_1)
+add_modules_library(subcomponent_2)
+```
+
+From the parent directory of my_modules, simply do
+
+```cmake
+add_modules_library(my_modules)
+target_link_libraries(my_modules PUBLIC subcomponent_1 subcomponent_2)
+```
+
+This will add all the exported modules and unit test programs to the build.
