@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 4.0)
 
+project(DraconicEngine LANGUAGES C CXX)
+
 find_package(Git QUIET)
+find_package(Threads REQUIRED)
 
 if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     message(STATUS "Updating submodules...")
@@ -15,11 +18,11 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     endif()
 endif()
 
-project(DraconicEngine LANGUAGES C CXX)
-
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
+include(CTest)
 include(Compiler)
+include(Modules)
 include(Shaders)
 
 # Subdirectories for engine libs
@@ -27,10 +30,6 @@ add_subdirectory(engine/native)
 
 # Main Executable
 add_executable(draconic engine/native/main/main.cpp)
-
-enable_modules(draconic)
-
-set_target_properties(draconic PROPERTIES CXX_SCAN_FOR_MODULES ON)
 
 target_link_libraries(draconic
     PRIVATE
@@ -53,8 +52,6 @@ target_link_libraries(draconic
     bx
     bimg
 )
-
-find_package(Threads REQUIRED)
 
 if(UNIX AND NOT APPLE)
     target_link_libraries(draconic PRIVATE SDL3::SDL3-static Threads::Threads dl)
