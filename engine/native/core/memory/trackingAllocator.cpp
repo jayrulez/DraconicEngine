@@ -66,27 +66,45 @@ namespace draco::memory::tracking
 		Node *node = allocData->nodes;
 		Node *prev;
 		Node *next;
+		Error err;
 		while (node && (node->details.data.data != block.data))
 		{
 			node = node->next;
 		}
-		if (node)
-		{
-			prev = node->prev;
-			next = node->next;
-			prev->next = next;
-			next->prev = prev;
-			memset(node, 0, sizeof(Node));
-		}
 		block.size += sizeof(Node);
-		return allocData->base.vtbl->free(allocData->base, block);
+		err = allocData->base.vtbl->free(allocData->base, block);
+		switch (err)
+		{
+		case Error::Okay:
+			if (node)
+			{
+				prev = node->prev;
+				next = node->next;
+				prev->next = next;
+				if (next)
+				{
+					next->prev = prev;
+				}
+				memset(node, 0, sizeof(Node));
+			}
+			[[fallthrough]]
+		default:
+			return err;
+		}
 	}
 
 	Error freeAll(Allocator alloc)
 	{
 		TrackingAllocator *allocData = (TrackingAllocator *)alloc.allocatorData;
-		allocData->nodes = nullptr;
-		return allocData->base.vtbl->freeAll(allocData->base);
+		Error err = allocData->base.vtbl->freeAll(allocData->base);
+		switch (err)
+		{
+		case Error::Okay:
+			allocData->nodes = nullptr;
+			[[fallthrough]]
+		default:
+			return err;
+		}
 	}
 
 	void getAnalytics(TrackingAllocator alloc, Analytics *analytics)
