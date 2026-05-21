@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 4.0)
 
+project(DraconicEngine LANGUAGES C CXX)
+
 find_package(Git QUIET)
 
 if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -15,10 +17,10 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     endif()
 endif()
 
-project(DraconicEngine LANGUAGES C CXX)
-
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 include(CTest)
+include(Compiler)
+include(Modules)
 
 add_subdirectory(engine/native)
