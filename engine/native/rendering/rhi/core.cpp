@@ -46,10 +46,15 @@ namespace draco::rendering::rhi
         });
     }
 
-    void destroy_later(bgfx::ShaderHandle handle)       { scrap_later(handle); }
-    void destroy_later(bgfx::TextureHandle handle)      { scrap_later(handle); }
-    void destroy_later(bgfx::FrameBufferHandle handle)  { scrap_later(handle); }
-    void destroy_later(bgfx::UniformHandle handle)      { scrap_later(handle); }
+    void destroy_later(bgfx::ShaderHandle handle)              { scrap_later(handle); }
+    void destroy_later(bgfx::ProgramHandle handle)             { scrap_later(handle); }
+    void destroy_later(bgfx::TextureHandle handle)             { scrap_later(handle); }
+    void destroy_later(bgfx::FrameBufferHandle handle)         { scrap_later(handle); }
+    void destroy_later(bgfx::UniformHandle handle)             { scrap_later(handle); }
+    void destroy_later(bgfx::VertexBufferHandle handle)         { scrap_later(handle); }
+    void destroy_later(bgfx::IndexBufferHandle handle)          { scrap_later(handle); }
+    void destroy_later(bgfx::DynamicVertexBufferHandle handle)   { scrap_later(handle); }
+    void destroy_later(bgfx::DynamicIndexBufferHandle handle)    { scrap_later(handle); }
 
     void process_deletions()
     {

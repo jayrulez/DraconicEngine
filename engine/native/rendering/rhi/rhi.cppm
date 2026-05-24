@@ -271,6 +271,17 @@ export namespace draco::rendering::rhi
     constexpr PipelineState operator&(PipelineState a, PipelineState b) {
         return static_cast<PipelineState>(static_cast<u64>(a) & static_cast<u64>(b));
     }
+
+    // Explicit overloads
+    void destroy_later(bgfx::ShaderHandle handle);
+    void destroy_later(bgfx::ProgramHandle handle);
+    void destroy_later(bgfx::TextureHandle handle);
+    void destroy_later(bgfx::FrameBufferHandle handle);
+    void destroy_later(bgfx::UniformHandle handle);
+    void destroy_later(bgfx::VertexBufferHandle handle);
+    void destroy_later(bgfx::IndexBufferHandle handle);
+    void destroy_later(bgfx::DynamicVertexBufferHandle handle);
+    void destroy_later(bgfx::DynamicIndexBufferHandle handle);
 }
 
 // These are the things that we don't export but are visible to all implementation files
@@ -291,12 +302,6 @@ namespace draco::rendering::rhi
     
     extern u16 g_width;
     extern u16 g_height;
-
-    // Explicit overloads
-    void destroy_later(bgfx::ShaderHandle handle);
-    void destroy_later(bgfx::TextureHandle handle);
-    void destroy_later(bgfx::FrameBufferHandle handle);
-    void destroy_later(bgfx::UniformHandle handle);
     
     // Ensures a handle is valid before use
     // TODO: Replace with something better
