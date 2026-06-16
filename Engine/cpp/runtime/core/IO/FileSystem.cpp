@@ -11,7 +11,7 @@ import core.stdtypes;
 
 namespace draco::core::io::filesystem
 {
-    std::vector<u8> load_binary(const std::string& path)
+    std::vector<u8> loadBinary(const std::string& path)
     {
         // Open at the end (ate) to get size and in binary mode
         std::ifstream file(path, std::ios::binary | std::ios::ate);

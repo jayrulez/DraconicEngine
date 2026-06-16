@@ -8,15 +8,15 @@ module;
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-module core.io.image_loader;
+module core.io.loader.image;
 
 import core.stdtypes;
 
 // TODO: I'm too lazy to write code so we need somethin' better
 
-namespace draco::core::io::image_loader
+namespace draco::core::io::loader::image
 {
-    ImageData load_image(const std::filesystem::path& path)
+    ImageData loadImage(const std::filesystem::path& path)
     {
         ImageData result;
 
@@ -53,7 +53,7 @@ namespace draco::core::io::image_loader
         result.width = static_cast<u16>(width);
         result.height = static_cast<u16>(height);
         result.channels = 4;
-        result.is_valid = true;
+        result.isValid = true;
 
         // Free the memory allocated by stb
         stbi_image_free(data);
