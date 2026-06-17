@@ -16,10 +16,10 @@ else()
     endif()
 endif()
 
-add_library(platform_impl STATIC
+add_library(Platform_impl STATIC
     ${PLATFORM_SRC}
 )
-target_include_directories(platform_impl
+target_include_directories(Platform_impl
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )

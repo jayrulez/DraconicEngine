@@ -8,7 +8,7 @@
 #include <cstdint>
 
 namespace draco::platform::impl {
-    NativeWindowFrame get_native_handles(void* sdl_window_ptr) {
+    NativeWindowFrame getNativeHandles(void* sdl_window_ptr) {
         SDL_Window* window = static_cast<SDL_Window*>(sdl_window_ptr);
         NativeWindowFrame frame;
         
