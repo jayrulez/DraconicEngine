@@ -27,9 +27,9 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    draco::input::set_mouse_captured(window, true);
+    draco::input::setMouseCaptured(window, true);
 
-    auto handles = draco::platform::get_native_handles(window);
+    auto handles = draco::platform::getNativeHandles(window);
 
     if (!handles.valid) {
         std::println("Failed to get native handles");
@@ -53,21 +53,21 @@ int main(int argc, char* argv[])
     auto cylinder_mesh = draco::rendering::mesh::create_cylinder(24, 2.0f); 
     auto capsule_mesh = draco::rendering::mesh::create_capsule(24, 12, 2.0f);
 
-    auto img = draco::core::io::image_loader::load_image("test.png");
+    auto img = draco::core::io::loader::image::loadImage("test.png");
 
     draco::rendering::rhi::TextureHandle tex = draco::rendering::rhi::InvalidTexture;
 
-    if (img.is_valid) {
+    if (img.isValid) {
         tex = draco::rendering::rhi::create_texture(img.pixels.data(), img.width, img.height);
     }
 
     auto s_texColor = draco::rendering::rhi::create_uniform("s_texColor", draco::rendering::rhi::UniformType::Sampler);
 
-    auto vs = draco::core::io::filesystem::load_binary("vs.bin");
-    auto fs = draco::core::io::filesystem::load_binary("fs.bin");
+    auto vs = draco::core::io::filesystem::loadBinary("vs.bin");
+    auto fs = draco::core::io::filesystem::loadBinary("fs.bin");
 
-    auto vs_quad = draco::core::io::filesystem::load_binary("vs_quad.bin");
-    auto fs_quad = draco::core::io::filesystem::load_binary("fs_quad.bin");
+    auto vs_quad = draco::core::io::filesystem::loadBinary("vs_quad.bin");
+    auto fs_quad = draco::core::io::filesystem::loadBinary("fs_quad.bin");
 
     if (vs.empty() || fs.empty() || vs_quad.empty() || fs_quad.empty()) {
         std::println("Shader load failed");
@@ -124,13 +124,13 @@ int main(int argc, char* argv[])
     scene.renderables.push_back({cylinder_mesh, tr, mat});
     scene.renderables.push_back({capsule_mesh, tr, mat});
 
-    scene.renderables[0].transform.set_position(-12.0f, 0.0f, 0.0f);
-    scene.renderables[1].transform.set_position(-6.0f, 0.0f, 0.0f);
-    scene.renderables[2].transform.set_position(0.0f, 0.0f, 0.0f);
-    scene.renderables[3].transform.set_position(6.0f, 0.0f, 0.0f);
-    scene.renderables[4].transform.set_position(12.0f, 0.0f, 0.0f);
+    scene.renderables[0].transform.setPosition(-12.0f, 0.0f, 0.0f);
+    scene.renderables[1].transform.setPosition(-6.0f, 0.0f, 0.0f);
+    scene.renderables[2].transform.setPosition(0.0f, 0.0f, 0.0f);
+    scene.renderables[3].transform.setPosition(6.0f, 0.0f, 0.0f);
+    scene.renderables[4].transform.setPosition(12.0f, 0.0f, 0.0f);
 
-    scene.renderables[1].transform.set_rotation(-bx::kPiHalf, 0.0f, 0.0f);
+    scene.renderables[1].transform.setRotation(-bx::kPiHalf, 0.0f, 0.0f);
     
     while (running)
     {
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
         last = now;
 
         SDL_Event e;
-        draco::input::begin_frame();
+        draco::input::beginFrame();
 
         while (SDL_PollEvent(&e))
         {
@@ -151,10 +151,10 @@ int main(int argc, char* argv[])
                 e.key.key == SDLK_ESCAPE)
             {
                 mouse_captured = !mouse_captured;
-                draco::input::set_mouse_captured(window, mouse_captured);
+                draco::input::setMouseCaptured(window, mouse_captured);
             }
 
-            draco::input::process_event(e);
+            draco::input::processEvent(e);
         }
 
         int w, h;

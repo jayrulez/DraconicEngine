@@ -23,7 +23,7 @@ target_include_directories(Platform_impl
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
-target_link_libraries(platform_impl PUBLIC SDL3::SDL3-static PRIVATE ${PLATFORM_DEPS})
+target_link_libraries(Platform_impl PUBLIC SDL3::SDL3-static PRIVATE ${PLATFORM_DEPS})
 if(DRACO_HAS_WAYLAND)
-    target_compile_definitions(platform_impl PRIVATE DRACO_HAS_WAYLAND=1)
+    target_compile_definitions(Platform_impl PRIVATE DRACO_HAS_WAYLAND=1)
 endif()

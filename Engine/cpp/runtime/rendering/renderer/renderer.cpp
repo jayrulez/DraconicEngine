@@ -117,7 +117,7 @@ namespace draco::rendering::renderer
 
         build_uniforms(material, p.uniforms);
 
-        transform.to_matrix(p.model);
+        transform.toMatrix(p.model);
 
         submit_entity(p);
     }

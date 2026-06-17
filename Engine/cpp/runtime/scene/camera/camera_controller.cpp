@@ -24,8 +24,8 @@ namespace draco::scene
 
     void CameraController::update(f32 dt)
     {
-        m_yaw   += draco::input::get_mouse_dx() * m_sensitivity;
-        m_pitch -= draco::input::get_mouse_dy() * m_sensitivity; // Temp fix to flip mouse input
+        m_yaw   += input::getMouseDx() * m_sensitivity;
+        m_pitch -= input::getMouseDy() * m_sensitivity; // Temp fix to flip mouse input
 
         // Clamp pitch
         if (m_pitch > 1.5f)  m_pitch = 1.5f;
@@ -45,27 +45,27 @@ namespace draco::scene
 
         f32 velocity = m_speed * dt;
 
-        if (draco::input::is_down(draco::input::Key::W))
+        if (input::isDown(input::Key::W))
         {
             m_x += forward.x * velocity;
             m_y += forward.y * velocity;
             m_z += forward.z * velocity;
         }
 
-        if (draco::input::is_down(draco::input::Key::S))
+        if (input::isDown(input::Key::S))
         {
             m_x -= forward.x * velocity;
             m_y -= forward.y * velocity;
             m_z -= forward.z * velocity;
         }
 
-        if (draco::input::is_down(draco::input::Key::A))
+        if (input::isDown(input::Key::A))
         {
             m_x += right.x * velocity;
             m_z += right.z * velocity;
         }
 
-        if (draco::input::is_down(draco::input::Key::D))
+        if (draco::input::isDown(draco::input::Key::D))
         {
             m_x -= right.x * velocity;
             m_z -= right.z * velocity;

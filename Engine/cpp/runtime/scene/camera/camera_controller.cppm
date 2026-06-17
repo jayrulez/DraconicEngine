@@ -11,7 +11,7 @@ export namespace draco::scene
 
         void update(f32 dt);
 
-        draco::rendering::renderer::Camera get_camera() const;
+        rendering::renderer::Camera get_camera() const;
 
     private:
         // Init with default values
