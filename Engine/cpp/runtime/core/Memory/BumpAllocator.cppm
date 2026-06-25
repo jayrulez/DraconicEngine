@@ -1,7 +1,8 @@
 module;
 
-#include <cassert>
+#ifdef DEBUG
 #include <source_location>
+#endif
 
 export module core.memory.bumpAllocator;
 export import core.memory.allocator;

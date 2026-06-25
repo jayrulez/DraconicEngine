@@ -1,6 +1,8 @@
 module;
 
+#ifdef DEBUG
 #include <source_location>
+#endif
 
 module core.memory.allocator;
 import core.stdtypes;

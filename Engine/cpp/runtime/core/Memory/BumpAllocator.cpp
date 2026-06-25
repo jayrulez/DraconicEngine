@@ -4,7 +4,9 @@ module;
 #include <bit>
 #include <cassert>
 #include <cstring>
+#ifdef DEBUG
 #include <source_location>
+#endif
 
 module core.memory.bumpAllocator;
 import core.stdtypes;

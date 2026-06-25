@@ -1,6 +1,8 @@
 module;
 
+#ifdef DEBUG
 #include <source_location>
+#endif
 
 export module core.memory.allocator;
 export import core.memory.slice;

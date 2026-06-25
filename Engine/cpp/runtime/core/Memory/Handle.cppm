@@ -17,12 +17,12 @@ export namespace draco::core::memory
         constexpr Handle() = default;
         constexpr explicit Handle(u32 v) : value(v) {}
 
-        constexpr u16 index() const
+        [[nodiscard]] constexpr u16 index() const
         {
             return static_cast<u16>(value & 0xFFFF);
         }
 
-        constexpr u16 generation() const
+        [[nodiscard]] constexpr u16 generation() const
         {
             return static_cast<u16>(value >> 16);
         }

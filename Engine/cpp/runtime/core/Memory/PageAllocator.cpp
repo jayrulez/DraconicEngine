@@ -1,6 +1,8 @@
 module;
 
+#ifdef DEBUG
 #include <source_location>
+#endif
 #ifdef __unix__
 #include <sys/mman.h>
 #include <unistd.h>

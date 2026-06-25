@@ -2,7 +2,9 @@ module;
 
 #include <bit>
 #include <cassert>
+#ifdef DEBUG
 #include <source_location>
+#endif
 
 module core.memory.fixedAllocator;
 import core.stdtypes;

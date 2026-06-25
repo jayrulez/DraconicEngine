@@ -18,7 +18,7 @@ export namespace draco::core::memory
             return storage.create(value);
         }
 
-        bool valid(HandleType h) const
+        [[nodiscard]] bool valid(HandleType h) const
         {
             return storage.valid(h);
         }
