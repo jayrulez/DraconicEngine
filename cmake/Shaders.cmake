@@ -1,6 +1,6 @@
 include_guard(GLOBAL)
 
-set(SHADER_SRC_DIR "${CMAKE_SOURCE_DIR}/Engine/cpp/runtime/Rendering/Shaders")
+set(SHADER_SRC_DIR "${CMAKE_SOURCE_DIR}/Engine/cpp/Runtime/Rendering/Shaders")
 set(SHADER_BIN_DIR "${CMAKE_BINARY_DIR}")
 set(BGFX_INCLUDE "${CMAKE_SOURCE_DIR}/Engine/cpp/ThirdParty/bgfx/src")
 
