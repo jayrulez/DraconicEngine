@@ -1,11 +1,11 @@
 #
 # Rendering Sample
 #
-add_executable(RenderSample rendering.cpp)
+add_executable(RenderSample RenderSample.cpp)
 
 target_link_libraries(RenderSample
         PRIVATE
-        runtime
+        Runtime
         bgfx
         bx
         bimg
