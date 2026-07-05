@@ -5,6 +5,7 @@ add_modules_library(Shell/Desktop)
 add_modules_library(Rendering/RHI PIC)
 add_modules_library(Rendering/RHI/Null)
 add_modules_library(Rendering/RHI/Validation)
+add_modules_library(Rendering/RHI/Vulkan)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 target_link_libraries(Shell PUBLIC Core)
@@ -15,6 +16,10 @@ target_link_libraries(Rendering_RHI_Null PUBLIC Rendering_RHI)
 # Validation wraps any backend; its test wraps the Null backend, so Null is
 # PUBLIC here to give the test the rhi.null module interface.
 target_link_libraries(Rendering_RHI_Validation PUBLIC Rendering_RHI Rendering_RHI_Null)
+# Vulkan GPU backend. The Vulkan loader is PRIVATE: VkIncludes.h/vulkan.h live in
+# the module's global fragment, so importers of rhi.vk don't need the headers, but
+# the static lib's loader symbols still propagate to the final link.
+target_link_libraries(Rendering_RHI_Vulkan PUBLIC Rendering_RHI PRIVATE Vulkan::Vulkan)
 # Shell backends: Null is headless (interface only); Desktop is SDL3-based.
 # SDL3 is PUBLIC on Desktop because SDL types (SDL3Window::handle()) surface in
 # its exported module interface, so consumers (incl. its tests) need SDL headers.
