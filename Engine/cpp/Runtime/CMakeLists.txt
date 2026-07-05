@@ -14,6 +14,7 @@ add_modules_library(Rendering/RenderGraph)
 add_modules_library(Rendering/Image)
 add_modules_library(Rendering/Image/IO)
 add_modules_library(Rendering/Texture)
+add_modules_library(Rendering/Geometry)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 # Shell is a single library: the interface plus both backends, separated only by folder
@@ -81,6 +82,8 @@ target_link_libraries(Rendering_Image PUBLIC Core)
 target_link_libraries(Rendering_Image_IO PUBLIC Rendering_Image Core PRIVATE stb_image)
 # Texture: image->RHI format descriptors (bridges CPU image data and the GPU RHI).
 target_link_libraries(Rendering_Texture PUBLIC Core Rendering_Image Rendering_RHI)
+# Geometry: CPU mesh data (static/skinned vertex streams, index buffers, primitives).
+target_link_libraries(Rendering_Geometry PUBLIC Core)
 target_link_libraries(Rendering_Graphics PUBLIC
     Rendering_RHI Rendering_RHI_Null Rendering_RHI_Vulkan Rendering_RHI_Validation Shell)
 if(WIN32)
