@@ -2,6 +2,7 @@ add_modules_library(Core PIC)
 add_modules_library(Shell)
 add_modules_library(Rendering/RHI PIC)
 add_modules_library(Rendering/RHI/Null)
+add_modules_library(Rendering/RHI/Validation)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 
@@ -37,3 +38,5 @@ endif()
 # Rendering: RHI is the backend-agnostic interface module (backends come later).
 target_link_libraries(Rendering_RHI PUBLIC Core)
 target_link_libraries(Rendering_RHI_Null PUBLIC Rendering_RHI)
+
+target_link_libraries(Rendering_RHI_Validation PUBLIC Rendering_RHI Rendering_RHI_Null)
