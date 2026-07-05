@@ -34,3 +34,4 @@ endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sdl sdl-build)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/stb)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/DXC)
