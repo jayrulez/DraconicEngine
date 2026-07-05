@@ -4,6 +4,7 @@ project(DraconicEngine LANGUAGES C CXX)
 
 find_package(Git QUIET)
 find_package(Threads REQUIRED)
+find_package(Vulkan REQUIRED)
 
 if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     message(STATUS "Updating submodules...")
