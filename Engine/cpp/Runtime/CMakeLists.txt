@@ -9,6 +9,7 @@ if(WIN32)
     add_modules_library(Rendering/RHI/DX12)
 endif()
 add_modules_library(Rendering/Shaders/System)
+add_modules_library(Rendering/Graphics)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 # Shell is a single library: the interface plus both backends, separated only by folder
@@ -62,4 +63,14 @@ target_link_libraries(Rendering_RHI_Vulkan PUBLIC Rendering_RHI PRIVATE Vulkan::
 if(WIN32)
     target_link_libraries(Rendering_RHI_DX12 PUBLIC Rendering_RHI PRIVATE d3d12 dxgi dxguid d3dcompiler)
     target_compile_options(Rendering_RHI_DX12 PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-language-extension-token>)
+endif()
+# Graphics render host: one target holding the graphics / graphics.null / graphics.gpu
+# modules. The core `graphics` interface imports only base RHI + Shell; graphics.gpu
+# pulls the backends. Shell is PUBLIC for the headless test. DX12 is added
+# (with DRACO_HAS_DX12) only on Windows.
+target_link_libraries(Rendering_Graphics PUBLIC
+    Rendering_RHI Rendering_RHI_Null Rendering_RHI_Vulkan Rendering_RHI_Validation Shell)
+if(WIN32)
+    target_link_libraries(Rendering_Graphics PUBLIC Rendering_RHI_DX12)
+    target_compile_definitions(Rendering_Graphics PUBLIC DRACO_HAS_DX12)
 endif()
