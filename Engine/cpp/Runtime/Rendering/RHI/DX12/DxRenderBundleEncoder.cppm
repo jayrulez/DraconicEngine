@@ -42,15 +42,15 @@ public:
     }
     ~DxRenderBundleEncoderImpl() override { delete m_bundle; }
 
-    void setPipeline(RenderPipeline* p) override { m_rec.SetPipeline(p); }
-    void setBindGroup(u32 i, BindGroup* g, std::span<const u32> d) override { m_rec.SetBindGroup(i, g, d); }
-    void setPushConstants(ShaderStage s, u32 o, u32 sz, const void* d) override { m_rec.SetPushConstants(s, o, sz, d); }
-    void setVertexBuffer(u32 slot, Buffer* b, u64 o) override { m_rec.SetVertexBuffer(slot, b, o); }
-    void setIndexBuffer(Buffer* b, IndexFormat f, u64 o) override { m_rec.SetIndexBuffer(b, f, o); }
-    void draw(u32 v, u32 inst, u32 fv, u32 fi) override { m_rec.Draw(v, inst, fv, fi); }
-    void drawIndexed(u32 ic, u32 inst, u32 fi, i32 bv, u32 finst) override { m_rec.DrawIndexed(ic, inst, fi, bv, finst); }
-    void drawIndirect(Buffer* b, u64 o, u32 dc, u32 st) override { m_rec.DrawIndirect(b, o, dc, st); }
-    void drawIndexedIndirect(Buffer* b, u64 o, u32 dc, u32 st) override { m_rec.DrawIndexedIndirect(b, o, dc, st); }
+    void setPipeline(RenderPipeline* p) override { m_rec.setPipeline(p); }
+    void setBindGroup(u32 i, BindGroup* g, std::span<const u32> d) override { m_rec.setBindGroup(i, g, d); }
+    void setPushConstants(ShaderStage s, u32 o, u32 sz, const void* d) override { m_rec.setPushConstants(s, o, sz, d); }
+    void setVertexBuffer(u32 slot, Buffer* b, u64 o) override { m_rec.setVertexBuffer(slot, b, o); }
+    void setIndexBuffer(Buffer* b, IndexFormat f, u64 o) override { m_rec.setIndexBuffer(b, f, o); }
+    void draw(u32 v, u32 inst, u32 fv, u32 fi) override { m_rec.draw(v, inst, fv, fi); }
+    void drawIndexed(u32 ic, u32 inst, u32 fi, i32 bv, u32 finst) override { m_rec.drawIndexed(ic, inst, fi, bv, finst); }
+    void drawIndirect(Buffer* b, u64 o, u32 dc, u32 st) override { m_rec.drawIndirect(b, o, dc, st); }
+    void drawIndexedIndirect(Buffer* b, u64 o, u32 dc, u32 st) override { m_rec.drawIndexedIndirect(b, o, dc, st); }
 
     RenderBundle* finish() override {
         if (m_bundle) return m_bundle;
