@@ -4,9 +4,11 @@ add_modules_library(Rendering/RHI PIC)
 add_modules_library(Rendering/RHI/Null)
 add_modules_library(Rendering/RHI/Validation)
 add_modules_library(Rendering/RHI/Vulkan)
+if(WIN32)
+    add_modules_library(Rendering/RHI/DX12)
+endif()
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
-
 # Shell is a single library: the interface plus both backends, separated only by folder
 # (Desktop/ = SDL3, Null/ = headless). SDL3 is a PRIVATE implementation detail; nothing
 # outside Shell sees it. createShell() dispatches to the backend chosen at compile time
@@ -35,11 +37,20 @@ if(CMAKE_TESTING_ENABLED)
         add_test(NAME ${SHELL_TEST_TARGET} COMMAND ${SHELL_TEST_TARGET} --reporter junit --out "Testing/${SHELL_TEST_TARGET}.xml")
     endforeach()
 endif()
-
-# Rendering: RHI is the backend-agnostic interface module (backends come later).
+# Rendering: RHI is the backend-agnostic interface module; Null is the headless
+# no-op backend (for tests/tools). GPU backends (Vulkan, DX12) come later.
 target_link_libraries(Rendering_RHI PUBLIC Core)
 target_link_libraries(Rendering_RHI_Null PUBLIC Rendering_RHI)
-
+# Validation wraps any backend; its test wraps the Null backend, so Null is
+# PUBLIC here to give the test the rhi.null module interface.
 target_link_libraries(Rendering_RHI_Validation PUBLIC Rendering_RHI Rendering_RHI_Null)
-
+# Vulkan GPU backend. The Vulkan loader is PRIVATE: VkIncludes.h/vulkan.h live in
+# the module's global fragment, so importers of rhi.vk don't need the headers, but
+# the static lib's loader symbols still propagate to the final link.
 target_link_libraries(Rendering_RHI_Vulkan PUBLIC Rendering_RHI PRIVATE Vulkan::Vulkan)
+# DX12 GPU backend (Windows only). Links the D3D12/DXGI system libraries privately;
+# IID_PPV_ARGS uses __uuidof, which Clang flags as a language extension.
+if(WIN32)
+    target_link_libraries(Rendering_RHI_DX12 PUBLIC Rendering_RHI PRIVATE d3d12 dxgi dxguid d3dcompiler)
+    target_compile_options(Rendering_RHI_DX12 PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-language-extension-token>)
+endif()
