@@ -8,6 +8,7 @@ add_modules_library(Rendering/RHI/Vulkan)
 if(WIN32)
     add_modules_library(Rendering/RHI/DX12)
 endif()
+add_modules_library(Rendering/Shaders/System)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 # Shell is a single library: the interface plus both backends, separated only by folder
@@ -44,6 +45,9 @@ endif()
 # (which also carries DRACO_DXC_PATH); the runtime library is dlopen'd, so only
 # the platform's dl library is linked.
 target_link_libraries(Rendering_Shaders PUBLIC Core Draco::DXCHeaders PRIVATE ${CMAKE_DL_LIBS})
+# ShaderSystem: variant compile-on-demand + cache. Needs the RHI (to create GPU
+# modules) on top of the RHI-free shaders module. Its test uses the Null backend.
+target_link_libraries(Rendering_Shaders_System PUBLIC Rendering_Shaders Rendering_RHI Rendering_RHI_Null)
 target_link_libraries(Rendering_RHI PUBLIC Core)
 target_link_libraries(Rendering_RHI_Null PUBLIC Rendering_RHI)
 # Validation wraps any backend; its test wraps the Null backend, so Null is
