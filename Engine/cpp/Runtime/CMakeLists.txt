@@ -1,5 +1,6 @@
 add_modules_library(Core PIC)
 add_modules_library(Shell)
+add_modules_library(Rendering/RHI PIC)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 
@@ -31,3 +32,6 @@ if(CMAKE_TESTING_ENABLED)
         add_test(NAME ${SHELL_TEST_TARGET} COMMAND ${SHELL_TEST_TARGET} --reporter junit --out "Testing/${SHELL_TEST_TARGET}.xml")
     endforeach()
 endif()
+
+# Rendering: RHI is the backend-agnostic interface module (backends come later).
+target_link_libraries(Rendering_RHI PUBLIC Core)
