@@ -23,7 +23,6 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(CTest)
 include(Compiler)
 include(Modules)
-include(Shaders)
 
 # Engine runtime (C++)
 add_subdirectory(Engine/cpp)
