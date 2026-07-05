@@ -1566,7 +1566,7 @@ TEST_SUITE("quaternion") {
         // Halfway 0..90 deg about Z is 45 deg: +X -> (cos45, sin45, 0).
         const Quaternion mid = slerp(a, b, 0.5f);
         const Vector3 rotated = rotateVector(mid, Vector3::xAxis());
-        const f32 c = cos(degToRad(45.0f));
+        const f32 c = std::cos(degToRad(45.0f));
         CHECK(nearlyEqual(rotated, Vector3{ c, c, 0.0f }, 1.0e-4f));
     }
 }
@@ -1603,7 +1603,7 @@ TEST_SUITE("transform") {
         CHECK(nearlyEqual(mid.position, Vector3{ 5.0f, 0.0f, 0.0f }));
         CHECK(nearlyEqual(mid.scale, Vector3{ 2.0f, 2.0f, 2.0f }));
         // Rotation slerped to 45 deg about Z: +X -> (cos45, sin45, 0).
-        const f32 c = cos(degToRad(45.0f));
+        const f32 c = std::cos(degToRad(45.0f));
         CHECK(nearlyEqual(rotateVector(mid.rotation, Vector3::xAxis()), Vector3{ c, c, 0.0f }, 1.0e-4f));
     }
 }

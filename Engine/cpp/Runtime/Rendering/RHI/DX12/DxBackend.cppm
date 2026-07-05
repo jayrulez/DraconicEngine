@@ -106,7 +106,7 @@ private:
         }
 
         // Expose adapters best-GPU-first; callers take [0]. See Backend::enumerateAdapters.
-        SortAdaptersByPreference(m_adapterPtrs);
+        sortAdaptersByPreference(m_adapterPtrs);
     }
 
     void destroyImpl() {
