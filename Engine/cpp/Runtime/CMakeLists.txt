@@ -11,6 +11,8 @@ endif()
 add_modules_library(Rendering/Shaders/System)
 add_modules_library(Rendering/Graphics)
 add_modules_library(Rendering/RenderGraph)
+add_modules_library(Rendering/Image)
+add_modules_library(Rendering/Image/IO)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 # Shell is a single library: the interface plus both backends, separated only by folder
@@ -72,6 +74,10 @@ endif()
 # RenderGraph: pass dependency resolution, transient aliasing, automatic barriers
 # over the RHI. Backend-agnostic (base RHI only); Null is PUBLIC for its headless tests.
 target_link_libraries(Rendering_RenderGraph PUBLIC Core Rendering_RHI Rendering_RHI_Null)
+# Image: CPU-side image data + manipulation (no RHI). IO adds stb load/save; stb is
+# PRIVATE (its headers live in the module's global fragment / the stb_impl TU).
+target_link_libraries(Rendering_Image PUBLIC Core)
+target_link_libraries(Rendering_Image_IO PUBLIC Rendering_Image Core PRIVATE stb_image)
 target_link_libraries(Rendering_Graphics PUBLIC
     Rendering_RHI Rendering_RHI_Null Rendering_RHI_Vulkan Rendering_RHI_Validation Shell)
 if(WIN32)
