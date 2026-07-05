@@ -1,4 +1,4 @@
-// SampleApp — abstract base for RHI samples. Brings up a window (shell), a Vulkan
+// SampleApp - abstract base for RHI samples. Brings up a window (shell), a Vulkan
 // backend (validation-wrapped), device, queue, and swap chain; pumps events, tracks
 // timing, and calls onRender(). Resize is detected by polling the window size; the
 // loop skips rendering while minimized.
