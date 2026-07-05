@@ -8,6 +8,6 @@ add_modules_library(Memory PIC)
 add_modules_library(Logging PIC)
 
 target_link_libraries(Math PUBLIC Definitions)
-target_link_libraries(IO PUBLIC Definitions stb_image)
+target_link_libraries(IO PUBLIC Definitions)
 target_link_libraries(Memory PUBLIC Definitions Math)
 target_link_libraries(Logging PUBLIC Definitions)
