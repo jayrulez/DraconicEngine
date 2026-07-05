@@ -11,6 +11,7 @@ if(WIN32)
     add_modules_library(Rendering/RHI/DX12)
 endif()
 add_modules_library(Rendering/Shaders/System)
+add_modules_library(Rendering/Graphics)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory)
 target_link_libraries(Shell PUBLIC Core)
@@ -43,3 +44,13 @@ endif()
 # its exported module interface, so consumers (incl. its tests) need SDL headers.
 target_link_libraries(Shell_Null PUBLIC Shell)
 target_link_libraries(Shell_Desktop PUBLIC Shell SDL3::SDL3-static)
+# Graphics render host: one target holding the graphics / graphics.null / graphics.gpu
+# modules. The core `graphics` interface imports only base RHI + Shell; graphics.gpu
+# pulls the backends. Shell_Null is PUBLIC for the headless test. DX12 is added
+# (with DRACO_HAS_DX12) only on Windows.
+target_link_libraries(Rendering_Graphics PUBLIC
+    Rendering_RHI Rendering_RHI_Null Rendering_RHI_Vulkan Rendering_RHI_Validation Shell Shell_Null)
+if(WIN32)
+    target_link_libraries(Rendering_Graphics PUBLIC Rendering_RHI_DX12)
+    target_compile_definitions(Rendering_Graphics PUBLIC DRACO_HAS_DX12)
+endif()
