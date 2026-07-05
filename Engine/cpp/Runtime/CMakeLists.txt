@@ -2,6 +2,7 @@ add_modules_library(Core PIC)
 add_modules_library(Shell)
 add_modules_library(Shell/Null)
 add_modules_library(Shell/Desktop)
+add_modules_library(Rendering/Shaders)
 add_modules_library(Rendering/RHI PIC)
 add_modules_library(Rendering/RHI/Null)
 add_modules_library(Rendering/RHI/Validation)
@@ -14,6 +15,10 @@ target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 target_link_libraries(Shell PUBLIC Core)
 # Rendering: RHI is the backend-agnostic interface module; Null is the headless
 # no-op backend (for tests/tools). GPU backends (Vulkan, DX12) come later.
+# Shaders: HLSL compilation via DXC. DXC's headers come from Draco::DXCHeaders
+# (which also carries DRACO_DXC_PATH); the runtime library is dlopen'd, so only
+# the platform's dl library is linked.
+target_link_libraries(Rendering_Shaders PUBLIC Core Draco::DXCHeaders PRIVATE ${CMAKE_DL_LIBS})
 target_link_libraries(Rendering_RHI PUBLIC Core)
 target_link_libraries(Rendering_RHI_Null PUBLIC Rendering_RHI)
 # Validation wraps any backend; its test wraps the Null backend, so Null is
