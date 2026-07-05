@@ -4,7 +4,7 @@ add_modules_library(IO)
 add_modules_library(Memory)
 add_modules_library(Logging)
 
-target_link_libraries(Math PUBLIC Definitions bx)
+target_link_libraries(Math PUBLIC Definitions)
 target_link_libraries(IO PUBLIC Definitions stb_image)
 target_link_libraries(Memory PUBLIC Definitions Math)
 target_link_libraries(Logging PUBLIC Definitions)

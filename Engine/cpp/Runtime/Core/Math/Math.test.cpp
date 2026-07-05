@@ -1423,15 +1423,187 @@ TEST_SUITE("vector4") {
         using math::Transform;
 
         static constexpr Transform transform;
-        STATIC_REQUIRE(transform.position[0] == 0.f);
-        STATIC_REQUIRE(transform.position[1] == 0.f);
-        STATIC_REQUIRE(transform.position[2] == 0.f);
-        STATIC_REQUIRE(transform.rotation[0] == 0.f);
-        STATIC_REQUIRE(transform.rotation[1] == 0.f);
-        STATIC_REQUIRE(transform.rotation[2] == 0.f);
-        STATIC_REQUIRE(transform.scale[0] == 1.f);
-        STATIC_REQUIRE(transform.scale[1] == 1.f);
-        STATIC_REQUIRE(transform.scale[2] == 1.f);
+        // Default: position 0, rotation identity, scale 1.
+        STATIC_REQUIRE(transform.position.x == 0.f);
+        STATIC_REQUIRE(transform.position.y == 0.f);
+        STATIC_REQUIRE(transform.position.z == 0.f);
+        STATIC_REQUIRE(transform.rotation.x == 0.f);
+        STATIC_REQUIRE(transform.rotation.y == 0.f);
+        STATIC_REQUIRE(transform.rotation.z == 0.f);
+        STATIC_REQUIRE(transform.rotation.w == 1.f);
+        STATIC_REQUIRE(transform.scale.x == 1.f);
+        STATIC_REQUIRE(transform.scale.y == 1.f);
+        STATIC_REQUIRE(transform.scale.z == 1.f);
+    }
+}
 
+TEST_SUITE("matrix4") {
+    TEST_CASE("identity and multiply") {
+        using namespace draco::math;
+        const Matrix4 id = Matrix4::identity();
+        const Matrix4 t = Matrix4::translation(Vector3{ 1.0f, 2.0f, 3.0f });
+
+        CHECK(nearlyEqual(id * t, t));
+        CHECK(nearlyEqual(t * id, t));
+
+        static_assert(Matrix4::identity()(0, 0) == 1.0f);
+        static_assert(Matrix4::identity()(0, 1) == 0.0f);
+    }
+
+    TEST_CASE("translation lives in the last row (row vectors)") {
+        using namespace draco::math;
+        const Matrix4 t = Matrix4::translation(Vector3{ 10.0f, 20.0f, 30.0f });
+        CHECK(t.m[3][0] == 10.0f);
+        CHECK(t.m[3][1] == 20.0f);
+        CHECK(t.m[3][2] == 30.0f);
+
+        const Vector3 p = transformPoint(Vector3{ 1.0f, 1.0f, 1.0f }, t);
+        CHECK(nearlyEqual(p, Vector3{ 11.0f, 21.0f, 31.0f }));
+
+        // Directions ignore translation.
+        CHECK(nearlyEqual(transformDirection(Vector3{ 1.0f, 0.0f, 0.0f }, t), Vector3{ 1.0f, 0.0f, 0.0f }));
+    }
+
+    TEST_CASE("rotationZ(90) maps +X to +Y (row vectors)") {
+        using namespace draco::math;
+        const Matrix4 rz = Matrix4::rotationZ(degToRad(90.0f));
+        CHECK(nearlyEqual(transformDirection(Vector3::xAxis(), rz), Vector3::yAxis()));
+
+        // rotationY(90) maps +Z to +X.
+        const Matrix4 ry = Matrix4::rotationY(degToRad(90.0f));
+        CHECK(nearlyEqual(transformDirection(Vector3::zAxis(), ry), Vector3::xAxis()));
+    }
+
+    TEST_CASE("2D affine helpers (transformPoint2D, operator==)") {
+        using namespace draco::math;
+        CHECK(Matrix4::identity() == Matrix4::identity());
+        CHECK_FALSE(Matrix4::translation(Vector3{ 1, 0, 0 }) == Matrix4::identity());
+
+        const Matrix4 t = Matrix4::translation(Vector3{ 5.0f, 7.0f, 0.0f });
+        CHECK(nearlyEqual(transformPoint2D(Vector2{ 1.0f, 2.0f }, t), Vector2{ 6.0f, 9.0f }));
+
+        // Row vectors, left-to-right: v * (S * T).
+        const Matrix4 st = Matrix4::scale(Vector3{ 2.0f, 3.0f, 1.0f }) * Matrix4::translation(Vector3{ 1.0f, 1.0f, 0.0f });
+        CHECK(nearlyEqual(transformPoint2D(Vector2{ 1.0f, 1.0f }, st), Vector2{ 3.0f, 4.0f }));
+
+        const Matrix4 rz = Matrix4::rotationZ(degToRad(90.0f));
+        CHECK(nearlyEqual(transformPoint2D(Vector2{ 1.0f, 0.0f }, rz), Vector2{ 0.0f, 1.0f }));
+    }
+
+    TEST_CASE("composition reads left-to-right (scale then translate)") {
+        using namespace draco::math;
+        const Matrix4 st = Matrix4::scale(Vector3{ 2.0f, 2.0f, 2.0f }) * Matrix4::translation(Vector3{ 1.0f, 0.0f, 0.0f });
+        const Vector3 p = transformPoint(Vector3{ 1.0f, 1.0f, 1.0f }, st);
+        CHECK(nearlyEqual(p, Vector3{ 3.0f, 2.0f, 2.0f }));
+    }
+
+    TEST_CASE("perspective has the expected projective structure") {
+        using namespace draco::math;
+        const Matrix4 proj = Matrix4::perspectiveFovRH(degToRad(90.0f), 1.0f, 1.0f, 100.0f);
+        CHECK(proj.m[2][3] == -1.0f);           // w' = -z (RH)
+        CHECK(nearlyEqual(proj.m[0][0], 1.0f)); // xScale = 1/tan(45) at aspect 1
+    }
+
+    TEST_CASE("determinant") {
+        using namespace draco::math;
+        CHECK(nearlyEqual(determinant(Matrix4::identity()), 1.0f));
+        CHECK(nearlyEqual(determinant(Matrix4::scale(Vector3{ 2.0f, 3.0f, 4.0f })), 24.0f));
+    }
+
+    TEST_CASE("inverse undoes the transform") {
+        using namespace draco::math;
+        Transform xform;
+        xform.scale = Vector3{ 2.0f, 0.5f, 3.0f };
+        xform.rotation = Quaternion::fromAxisAngle(normalize(Vector3{ 1.0f, 2.0f, 3.0f }), degToRad(50.0f));
+        xform.position = Vector3{ 5.0f, -2.0f, 1.0f };
+
+        const Matrix4 m = xform.toMatrix();
+        const Matrix4 inv = inverse(m);
+
+        CHECK(nearlyEqual(m * inv, Matrix4::identity(), 1.0e-3f));
+        CHECK(nearlyEqual(inv * m, Matrix4::identity(), 1.0e-3f));
+
+        // Point transformed then inverse-transformed returns to itself.
+        const Vector3 p{ 3.0f, 4.0f, 5.0f };
+        const Vector3 roundTrip = transformPoint(transformPoint(p, m), inv);
+        CHECK(nearlyEqual(roundTrip, p, 1.0e-3f));
+
+        // Singular matrix -> identity (no divide-by-zero).
+        CHECK(nearlyEqual(inverse(Matrix4::scale(Vector3::zero)), Matrix4::identity()));
+    }
+}
+
+TEST_SUITE("quaternion") {
+    TEST_CASE("rotates vectors and agrees with its matrix") {
+        using namespace draco::math;
+        const Quaternion q = Quaternion::fromAxisAngle(Vector3::zAxis(), degToRad(90.0f));
+
+        // 90 deg about Z maps +X to +Y.
+        CHECK(nearlyEqual(rotateVector(q, Vector3::xAxis()), Vector3::yAxis()));
+
+        // Quaternion rotation and its matrix agree.
+        const Matrix4 r = rotationMatrix(q);
+        CHECK(nearlyEqual(rotateVector(q, Vector3::xAxis()), transformDirection(Vector3::xAxis(), r)));
+        CHECK(nearlyEqual(rotateVector(q, Vector3{ 0.3f, -0.5f, 0.8f }),
+                          transformDirection(Vector3{ 0.3f, -0.5f, 0.8f }, r)));
+
+        // Identity does nothing.
+        CHECK(nearlyEqual(rotateVector(Quaternion::identity, Vector3{ 1.0f, 2.0f, 3.0f }), Vector3{ 1.0f, 2.0f, 3.0f }));
+
+        // Composition: two 45-deg rotations == one 90-deg.
+        const Quaternion half = Quaternion::fromAxisAngle(Vector3::zAxis(), degToRad(45.0f));
+        CHECK(nearlyEqual(rotateVector(half * half, Vector3::xAxis()), Vector3::yAxis()));
+    }
+
+    TEST_CASE("slerp endpoints and midpoint") {
+        using namespace draco::math;
+        const Quaternion a = Quaternion::identity;
+        const Quaternion b = Quaternion::fromAxisAngle(Vector3::zAxis(), degToRad(90.0f));
+
+        CHECK(nearlyEqual(slerp(a, b, 0.0f), a));
+        CHECK(nearlyEqual(slerp(a, b, 1.0f), b));
+
+        // Halfway 0..90 deg about Z is 45 deg: +X -> (cos45, sin45, 0).
+        const Quaternion mid = slerp(a, b, 0.5f);
+        const Vector3 rotated = rotateVector(mid, Vector3::xAxis());
+        const f32 c = cos(degToRad(45.0f));
+        CHECK(nearlyEqual(rotated, Vector3{ c, c, 0.0f }, 1.0e-4f));
+    }
+}
+
+TEST_SUITE("transform") {
+    TEST_CASE("composes scale, rotation, translation") {
+        using namespace draco::math;
+        Transform xform;
+        xform.scale = Vector3{ 2.0f, 2.0f, 2.0f };
+        xform.rotation = Quaternion::fromAxisAngle(Vector3::zAxis(), degToRad(90.0f));
+        xform.position = Vector3{ 5.0f, 0.0f, 0.0f };
+
+        const Matrix4 m = xform.toMatrix();
+
+        // (1,0,0) -> scale*2 -> (2,0,0) -> rot90Z -> (0,2,0) -> +translate -> (5,2,0)
+        const Vector3 p = transformPoint(Vector3::xAxis(), m);
+        CHECK(nearlyEqual(p, Vector3{ 5.0f, 2.0f, 0.0f }));
+
+        // Identity transform is a no-op.
+        Transform id;
+        CHECK(nearlyEqual(transformPoint(Vector3{ 7.0f, 8.0f, 9.0f }, id.toMatrix()),
+                          Vector3{ 7.0f, 8.0f, 9.0f }));
+    }
+
+    TEST_CASE("lerp interpolates position, scale, and rotation") {
+        using namespace draco::math;
+        Transform a;
+        Transform b;
+        b.position = Vector3{ 10.0f, 0.0f, 0.0f };
+        b.scale = Vector3{ 3.0f, 3.0f, 3.0f };
+        b.rotation = Quaternion::fromAxisAngle(Vector3::zAxis(), degToRad(90.0f));
+
+        const Transform mid = Transform::lerp(a, b, 0.5f);
+        CHECK(nearlyEqual(mid.position, Vector3{ 5.0f, 0.0f, 0.0f }));
+        CHECK(nearlyEqual(mid.scale, Vector3{ 2.0f, 2.0f, 2.0f }));
+        // Rotation slerped to 45 deg about Z: +X -> (cos45, sin45, 0).
+        const f32 c = cos(degToRad(45.0f));
+        CHECK(nearlyEqual(rotateVector(mid.rotation, Vector3::xAxis()), Vector3{ c, c, 0.0f }, 1.0e-4f));
     }
 }

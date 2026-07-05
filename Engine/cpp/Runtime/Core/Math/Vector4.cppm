@@ -496,6 +496,12 @@ export namespace draco::math {
     [[nodiscard]] constexpr bool approx_eq(const Vector4& a, const Vector4& b) noexcept {
         return distance_sq(a, b) < CMP_EPSILON2;
     }
+
+    // Component-wise approximate equality against an epsilon.
+    [[nodiscard]] inline bool nearlyEqual(const Vector4& a, const Vector4& b, f32 epsilon = CMP_EPSILON) noexcept {
+        return nearlyEqual(a.x, b.x, epsilon) && nearlyEqual(a.y, b.y, epsilon)
+            && nearlyEqual(a.z, b.z, epsilon) && nearlyEqual(a.w, b.w, epsilon);
+    }
 } // namespace draco::math
 
 export namespace std {
