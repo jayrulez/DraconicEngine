@@ -15,6 +15,7 @@ add_modules_library(Rendering/Graphics)
 add_modules_library(Rendering/RenderGraph)
 add_modules_library(Rendering/Image)
 add_modules_library(Rendering/Image/IO)
+add_modules_library(Rendering/Texture)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory)
 target_link_libraries(Shell PUBLIC Core)
@@ -58,6 +59,8 @@ target_link_libraries(Rendering_RenderGraph PUBLIC Core Rendering_RHI Rendering_
 # PRIVATE (its headers live in the module's global fragment / the stb_impl TU).
 target_link_libraries(Rendering_Image PUBLIC Core)
 target_link_libraries(Rendering_Image_IO PUBLIC Rendering_Image Core PRIVATE stb_image)
+# Texture: image->RHI format descriptors (bridges CPU image data and the GPU RHI).
+target_link_libraries(Rendering_Texture PUBLIC Core Rendering_Image Rendering_RHI)
 target_link_libraries(Rendering_Graphics PUBLIC
     Rendering_RHI Rendering_RHI_Null Rendering_RHI_Vulkan Rendering_RHI_Validation Shell Shell_Null)
 if(WIN32)
