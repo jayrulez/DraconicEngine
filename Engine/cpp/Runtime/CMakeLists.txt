@@ -1,5 +1,6 @@
 add_modules_library(Core PIC)
 add_modules_library(Profiler)
+add_modules_library(Animation)
 add_modules_library(Shell)
 add_modules_library(Rendering/Shaders)
 add_modules_library(Rendering/RHI PIC)
@@ -34,6 +35,9 @@ target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 # Profiler: lightweight hierarchical CPU scope profiler (Core-only). Instrumentation is
 # via the DRACO_PROFILE_SCOPE macro in Profiler/Profiler.h; off by default (DRACO_PROFILING).
 target_link_libraries(Profiler PUBLIC Core)
+# Animation: skeletal-animation foundation (skeleton/pose/clip/sampler/player/graph),
+# Core-only and RHI-free; the renderer consumes its skinning matrices.
+target_link_libraries(Animation PUBLIC Core)
 # Shell is a single library: the interface plus both backends, separated only by folder
 # (Desktop/ = SDL3, Null/ = headless). SDL3 is a PRIVATE implementation detail; nothing
 # outside Shell sees it. createShell() dispatches to the backend chosen at compile time
