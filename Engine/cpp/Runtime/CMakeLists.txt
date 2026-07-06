@@ -15,6 +15,8 @@ add_modules_library(Rendering/Image)
 add_modules_library(Rendering/Image/IO)
 add_modules_library(Rendering/Texture)
 add_modules_library(Rendering/Geometry)
+add_modules_library(Rendering/Materials)
+add_modules_library(Rendering/Materials/PSO)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 # Shell is a single library: the interface plus both backends, separated only by folder
@@ -84,6 +86,13 @@ target_link_libraries(Rendering_Image_IO PUBLIC Rendering_Image Core PRIVATE stb
 target_link_libraries(Rendering_Texture PUBLIC Core Rendering_Image Rendering_RHI)
 # Geometry: CPU mesh data (static/skinned vertex streams, index buffers, primitives).
 target_link_libraries(Rendering_Geometry PUBLIC Core)
+# Materials: data-driven material model (PipelineConfig, Material/Builder/Instance, and
+# the bind-group-inferring MaterialSystem). Needs the RHI + Shaders (ShaderFlags); Null
+# is PUBLIC for the headless test.
+target_link_libraries(Rendering_Materials PUBLIC Core Rendering_RHI Rendering_Shaders Rendering_RHI_Null)
+# PSO cache: bridges the ShaderSystem (variants) and Materials (PipelineConfig). Its test
+# compiles real shaders via the ShaderSystem against the Null backend.
+target_link_libraries(Rendering_Materials_PSO PUBLIC Rendering_Materials Rendering_Shaders_System Rendering_RHI Rendering_RHI_Null)
 target_link_libraries(Rendering_Graphics PUBLIC
     Rendering_RHI Rendering_RHI_Null Rendering_RHI_Vulkan Rendering_RHI_Validation Shell)
 if(WIN32)
