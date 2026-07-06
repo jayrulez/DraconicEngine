@@ -17,6 +17,17 @@ add_modules_library(Rendering/Texture)
 add_modules_library(Rendering/Geometry)
 add_modules_library(Rendering/Materials)
 add_modules_library(Rendering/Materials/PSO)
+# Model is one module whose partitions keep their folder separation: the loaders (FBX,
+# GLTF) and the IO registry live in subdirs, so append them (and the ufbx/cgltf impl
+# TUs) to the target the glob created from the top-level interface partitions.
+add_modules_library(Rendering/Model)
+target_sources(Rendering_Model PUBLIC FILE_SET CXX_MODULES FILES
+    Rendering/Model/IO/ModelIOModule.cppm
+    Rendering/Model/FBX/FbxLoader.cppm
+    Rendering/Model/GLTF/GltfLoader.cppm)
+target_sources(Rendering_Model PRIVATE
+    Rendering/Model/FBX/ufbx_impl.cpp
+    Rendering/Model/GLTF/cgltf_impl.cpp)
 
 target_link_libraries(Core PUBLIC Definitions Math IO Memory Logging)
 # Shell is a single library: the interface plus both backends, separated only by folder
@@ -93,6 +104,9 @@ target_link_libraries(Rendering_Materials PUBLIC Core Rendering_RHI Rendering_Sh
 # PSO cache: bridges the ShaderSystem (variants) and Materials (PipelineConfig). Its test
 # compiles real shaders via the ShaderSystem against the Null backend.
 target_link_libraries(Rendering_Materials_PSO PUBLIC Rendering_Materials Rendering_Shaders_System Rendering_RHI Rendering_RHI_Null)
+# Model: importer representation + FBX(ufbx)/GLTF(cgltf) loaders. Loads embedded/external
+# textures via Image; the ufbx/cgltf single-header libs are compiled in the impl TUs.
+target_link_libraries(Rendering_Model PUBLIC Core Rendering_Image Rendering_Image_IO PRIVATE ufbx cgltf)
 target_link_libraries(Rendering_Graphics PUBLIC
     Rendering_RHI Rendering_RHI_Null Rendering_RHI_Vulkan Rendering_RHI_Validation Shell)
 if(WIN32)
