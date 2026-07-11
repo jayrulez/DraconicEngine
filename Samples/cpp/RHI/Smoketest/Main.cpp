@@ -44,7 +44,7 @@ int main(int /*argc*/, char** /*argv*/) {
     ws.title  = u8"Draconic Smoketest";
     ws.width  = 1280;
     ws.height = 720;
-    std::unique_ptr<shell::IShell> plat = shell::createShell(ws);
+    std::unique_ptr<shell::IShell, decltype(&shell::destroyShell)> plat{ shell::createShell(ws), shell::destroyShell };
     if (!plat || plat->mainWindow() == nullptr) {
         std::fprintf(stderr, "shell/window init failed\n");
         return 1;

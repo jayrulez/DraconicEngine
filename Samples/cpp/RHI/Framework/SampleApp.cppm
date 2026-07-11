@@ -52,7 +52,7 @@ protected:
     virtual void   onResize(u32, u32) {}
     virtual void   onShutdown() = 0;
 
-    shell::IShell* m_shell = nullptr;   // borrowed from m_shellOwner
+    shell::IShell* m_shell = nullptr;   // owns the shell (created in init(), freed in shutdown())
     shell::IWindow*   m_window   = nullptr;
     rhi::Backend*       m_backend  = nullptr;
     rhi::Device*        m_device   = nullptr;
@@ -71,7 +71,6 @@ protected:
 private:
     BackendType m_backendType;
     bool        m_validationEnabled;
-    std::unique_ptr<shell::IShell> m_shellOwner;
 
     Status init();
     void   mainLoop();
@@ -104,8 +103,7 @@ inline Status SampleApp::init() {
     ws.width  = m_width;
     ws.height = m_height;
 
-    m_shellOwner = shell::createShell(ws);
-    m_shell = m_shellOwner.get();
+    m_shell = shell::createShell(ws);
     if (m_shell == nullptr || m_shell->mainWindow() == nullptr) {
         rhi::logError("SampleApp: shell/window init failed"); return ErrorCode::Unknown;
     }
@@ -229,7 +227,7 @@ inline void SampleApp::shutdown() {
     if (m_surface)   { m_device->destroySurface(m_surface);     m_surface   = nullptr; }
     if (m_device)    { m_device->destroy();                    m_device    = nullptr; }
     if (m_backend)   { m_backend->destroy();                   m_backend   = nullptr; }
-    m_shellOwner.reset();   // destroys the window + shell
+    if (m_shell != nullptr) { shell::destroyShell(m_shell); m_shell = nullptr; }   // destroys the window + shell
 }
 
 } // namespace draco::samples::framework
