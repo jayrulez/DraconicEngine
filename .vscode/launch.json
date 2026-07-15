@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Launches whatever target is selected in the CMake Tools status bar.
+            "name": "CMake: Launch Target",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "cwd": "${command:cmake.launchTargetDirectory}"
+        },
+        {
+            "name": "RenderSample",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/Samples/cpp/Render/RenderSample",
+            "cwd": "${workspaceFolder}/build/release/Samples/cpp/Render"
+        },
+        {
+            "name": "Math Test",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/Engine/cpp/Runtime/Core/Math_test",
+            "cwd": "${workspaceFolder}/build/release/Engine/cpp/Runtime/Core"
+        },
+        {
+            "name": "Shell (SDL3) Test",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/Engine/cpp/Runtime/Shell_SDL3Shell_test",
+            "cwd": "${workspaceFolder}/build/release/Engine/cpp/Runtime"
+        },
+        {
+            "name": "Shell (Null) Test",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/Engine/cpp/Runtime/Shell_NullShell_test",
+            "cwd": "${workspaceFolder}/build/release/Engine/cpp/Runtime"
+        }
+    ]
+}
